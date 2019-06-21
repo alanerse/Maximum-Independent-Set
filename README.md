@@ -1,2 +1,2 @@
 # IndependentSet
-Algoritmo de conjunto independente máximo, utilizando Branch and Bound
+Algoritmo de conjunto independente máximo(talvez kkkk), utilizando Branch and Bound
