@@ -31,49 +31,76 @@ for i in range(n):
     }
 #def eCompleta():
 melhor = []
+consistente=False
+contar = 0
 def BranchBound(listaVertices, solucao, tam, j):
     global melhor
-    if(eCompleta(listaVertices)):
-        print(len(solucao))
-        print(len(melhor))
-        if(len(solucao) > len(melhor)):
+    global consistente
+    global contar
+    if(eCompleta(j,tam)):
+        print(solucao)
+        contar = contar + 1
+
+        if(len(solucao) >= len(melhor)):
             melhor = solucao[:]
-        print(melhor)
+        print(contar)
+
     else:
 
         while (j < tam):
             solucao.append(listaVertices[j])
-            if(ePromissor(listaVertices[j])):
-                if(eConsistente(solucao,listaVertices[j],listaVertices)):
+            if(ePromissor(listaVertices,solucao,melhor)):
+                consistente = eConsistente(solucao,listaVertices[j],listaVertices)
+                if(consistente):
                     BranchBound(listaVertices,solucao,tam, j+1)
 
-            solucao.pop()
+
+            aux = solucao.pop()
+
+            listaVertices[aux["valor"]]["presente"]=False
+                # for k in aux["adjacentes"]:
+                #     listaVertices[k]["presente"]=False
             j = j+1
 
+            if (eCompleta(j, tam)):
+                print(solucao)
+                contar = contar + 1
+
+                if (len(solucao) >= len(melhor)):
+                    melhor = solucao[:]
+                # print(contar)
 
 
-def eCompleta(listaVertices):
-    for i in listaVertices:
-        if(i['presente'] == False):
-            return False
-    return True
 
-def ePromissor(inserido):
-    if(inserido['presente'] == 'True'):
+
+def eCompleta(j,tam):
+
+    if(j==tam):
+        return True
+    return False
+
+def ePromissor(listaVertices,solucao,melhor):
+
+    cont = 0
+    for a in listaVertices:
+
+        if(a["presente"]==False):
+            cont = cont + 1
+    if(len(melhor)< len(solucao)+cont-1):
+        return True
+    else:
         return False
 
-
-    return True
-
 def eConsistente(solucao,inserido,listaVertices):
-
+    if (inserido['presente'] == 'True'):
+        return False
     for i in solucao:
         for j in i['adjacentes']:
             if (j == inserido['valor']):
                 return False
     listaVertices[inserido['valor']]['presente'] = True
-    for j in inserido['adjacentes']:
-        listaVertices[j]['presente'] = True
+    # for j in inserido['adjacentes']:
+    #     listaVertices[j]['presente'] = True
     # listaVertices[inserido[]]
     return True
 
@@ -84,13 +111,14 @@ solucao = []
 #for i in listaVertices:
 
 
-for i in range(n):
-    for j in range(n):
-        if(len(listaVertices[i]['adjacentes']) < len(listaVertices[j]['adjacentes']) ):
-            aux = listaVertices[j]
-            listaVertices[j] = listaVertices[i]
-            listaVertices[i] = aux
+# for i in range(n):
+#     for j in range(n):
+#         if(len(listaVertices[i]['adjacentes']) < len(listaVertices[j]['adjacentes']) ):
+#             aux = listaVertices[j]
+#             listaVertices[j] = listaVertices[i]
+#             listaVertices[i] = aux
 j = 0
 
 solucoes = []
 BranchBound(listaVertices, solucao, n, j)
+print(melhor)
