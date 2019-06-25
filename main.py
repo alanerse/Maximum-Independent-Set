@@ -1,11 +1,10 @@
-arq = open('grafo.txt', 'r')
+arq = open('grafo_modelo2.txt', 'r')
 texto = []
 matriz = []
 texto = arq.readlines()
 for i in range(len(texto)):
     if(i != 0):
        matriz.append(texto[i].split())
-
 
 arq.close()
 n = i
@@ -38,12 +37,10 @@ def BranchBound(listaVertices, solucao, tam, j):
     global consistente
     global contar
     if(eCompleta(j,tam)):
-        print(solucao)
         contar = contar + 1
 
         if(len(solucao) >= len(melhor)):
             melhor = solucao[:]
-        print(contar)
 
     else:
 
@@ -54,7 +51,6 @@ def BranchBound(listaVertices, solucao, tam, j):
                 if(consistente):
                     BranchBound(listaVertices,solucao,tam, j+1)
 
-
             aux = solucao.pop()
 
             listaVertices[aux["valor"]]["presente"]=False
@@ -63,15 +59,10 @@ def BranchBound(listaVertices, solucao, tam, j):
             j = j+1
 
             if (eCompleta(j, tam)):
-                print(solucao)
                 contar = contar + 1
 
                 if (len(solucao) >= len(melhor)):
                     melhor = solucao[:]
-                # print(contar)
-
-
-
 
 def eCompleta(j,tam):
 
@@ -104,9 +95,6 @@ def eConsistente(solucao,inserido,listaVertices):
     # listaVertices[inserido[]]
     return True
 
-
-
-
 solucao = []
 #for i in listaVertices:
 
@@ -119,6 +107,44 @@ solucao = []
 #             listaVertices[i] = aux
 j = 0
 
-solucoes = []
+#solucoes = []
+j=0
 BranchBound(listaVertices, solucao, n, j)
-print(melhor)
+print("Conjunto independente máximo: ")
+
+for i in melhor:
+
+    print(i["valor"] , " ")
+
+del listaVertices[:]
+del melhor[:]
+for i in range(n):
+    for j in range(n):
+        if(i==j) :
+            matriz[i][j]='0'
+        else:
+            if(matriz[i][j]=='1'):
+                matriz[i][j]='0'
+            else:
+                matriz[i][j]='1'
+
+for i in range(n):
+    vertice['valor'] = i
+    for j in range(n):
+        if(matriz[i][j] == '1'):
+            vertice['adjacentes'].append(j)
+    listaVertices.append(vertice)
+    vertice = {
+        'valor': None,
+        'adjacentes': [],
+        'presente':False
+
+    }
+
+j=0
+BranchBound(listaVertices, solucao, n, j)
+print("Clique máximo: ")
+
+for i in melhor:
+
+    print(i["valor"] , " ")
