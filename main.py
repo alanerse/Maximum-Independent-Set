@@ -1,4 +1,4 @@
-arq = open('grafo.txt', 'r')
+arq = open('grafo_modelo.txt', 'r')
 texto = []
 matriz = []
 texto = arq.readlines()
@@ -29,7 +29,7 @@ for i in range(n):
 
     }
 
-arqSat = open('entradaSat.txt', 'r')
+arqSat = open('grafo_Sat_modelo1.txt', 'r')
 textoSat = []
 matrizSat = []
 matrizGrafoSat= []
@@ -39,7 +39,7 @@ for i in range(len(textoSat)):
     if(i != 0):
        matrizSat.append(textoSat[i].split())
 
-arq.close()
+arqSat.close()
 variaveisSat = textoSat[0].split()
 variaveisSat = int(variaveisSat[0])
 for y in range(len(matrizSat)*variaveisSat):
@@ -61,36 +61,54 @@ for i in range(len(matrizSat)):
            matrizAux[i].append('0')
 i = 0
 j = 0
-k = 0
-l = 0
-#montagem da primeira parte do grafo
-for i in range(len(matrizSat)):
+
+listaSAT = []
+for y in range(len(matrizSat)*variaveisSat):
+    verticeSatAux = {
+        'valor': None,
+        'adjacentes': [],
+        'presente': False,
+        'barrado': False,
+    }
+    listaSAT.append(verticeSatAux)
+
+verticeSat = {
+    'valor': None,
+    'adjacentes':[],
+    'presente':False,
+    'barrado':False,
+}
+
+# ATRIBUICAO DAS ADJACENCIAS A PARTIR DO 6
+for i in range(len(matrizAux)):
     for j in range(variaveisSat):
         if(matrizAux[i][j] == '1'):
+            verticeSat['valor'] = i*variaveisSat+j
             for k in range(variaveisSat):
-                if(k != j and matrizAux[i][k] == '1'):
-                   matrizGrafoSat[(i*variaveisSat)+k].append('1')
-                else:
-                   matrizGrafoSat[(i*variaveisSat) + k].append('0')
-        else:
-           for l in range(variaveisSat):
-                matrizGrafoSat[(i*variaveisSat)+l].append('0')
+                if(matrizAux[i][k] == '1' and k!=j):
+                    verticeSat['adjacentes'].append(int(k))
+                    if(matrizSat[i][j] == '0'):
+                        verticeSat['barrado'] = True
+            listaSAT[i*variaveisSat+j] = verticeSat
+            verticeSat = {
+                'valor': None,
+                'adjacentes': [],
+                'presente': False,
+                'barrado': False,
+            }
 
-for i in range(len(matrizGrafoSat)):
-    for j in range((len(matrizSat)*variaveisSat)-variaveisSat):
-        matrizGrafoSat[i].append(('0'))
 
-#acrescentando arestas necessarias
-i = 0
-j = 0
-k = 0
-l = 0
-for i in range(len(matrizSat)):
-    for j in range(variaveisSat):
-        for k in range(len(matrizSat)):
-            if(matrizSat[i][j] != matrizSat[k][j] and matrizSat[i][j] != '2' and matrizSat[k][j] != '2'):
-                matrizGrafoSat[i][k*6] = '1'
-                print('oi')
+i=0
+j=0
+for i in range(len(matrizAux)):
+    for j in range(len(matrizAux)*variaveisSat):
+        if(j%variaveisSat==i):
+
+            if (listaSAT[j]["valor"] != None and len(listaSAT[j])!=0 and i!=j and listaSAT[i]["barrado"] != listaSAT[j]["barrado"]):
+                listaSAT[i]["adjacentes"].append(listaSAT[j]["valor"])
+                listaSAT[j]["adjacentes"].append(listaSAT[i]["valor"])
+i=0
+
 #def eCompleta():
 melhor = []
 consistente=False
@@ -116,7 +134,8 @@ def BranchBound(listaVertices, solucao, tam, j):
 
             aux = solucao.pop()
 
-            listaVertices[aux["valor"]]["presente"]=False
+            if(aux["valor"]!= None):
+                listaVertices[aux["valor"]]["presente"]=False
                 # for k in aux["adjacentes"]:
                 #     listaVertices[k]["presente"]=False
             j = j+1
@@ -146,7 +165,7 @@ def ePromissor(listaVertices,solucao,melhor):
         return False
 
 def eConsistente(solucao,inserido,listaVertices):
-    if (inserido['presente'] == 'True'):
+    if (inserido['presente'] == 'True' or inserido['valor'] == None):
         return False
     for i in solucao:
         for j in i['adjacentes']:
@@ -159,8 +178,17 @@ def eConsistente(solucao,inserido,listaVertices):
     return True
 
 solucao = []
-#for i in listaVertices:
+j=0
+BranchBound(listaSAT, solucao, len(listaSAT), j)
+print("Satisfabilidade: ")
+solucao = []
+j=0
 
+for i in melhor:
+
+    print(i["valor"] , " ")
+#for i in listaVertices:
+del melhor[:]
 
 # for i in range(n):
 #     for j in range(n):
@@ -211,3 +239,5 @@ print("Clique maximo: ")
 for i in melhor:
 
     print(i["valor"] , " ")
+
+
