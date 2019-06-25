@@ -1,4 +1,4 @@
-arq = open('grafo_modelo2.txt', 'r')
+arq = open('grafo.txt', 'r')
 texto = []
 matriz = []
 texto = arq.readlines()
@@ -28,6 +28,69 @@ for i in range(n):
         'presente':False
 
     }
+
+arqSat = open('entradaSat.txt', 'r')
+textoSat = []
+matrizSat = []
+matrizGrafoSat= []
+matrizAux = []
+textoSat = arqSat.readlines()
+for i in range(len(textoSat)):
+    if(i != 0):
+       matrizSat.append(textoSat[i].split())
+
+arq.close()
+variaveisSat = textoSat[0].split()
+variaveisSat = int(variaveisSat[0])
+for y in range(len(matrizSat)*variaveisSat):
+    linhaAux = []
+    matrizGrafoSat.append(linhaAux[:])
+for z in range(len(matrizSat)):
+    linhaAux = []
+    matrizAux.append(linhaAux[:])
+
+i=0
+j=0
+
+for i in range(len(matrizSat)):
+    for j in range(variaveisSat):
+        print(matrizSat[i][j])
+        if(matrizSat[i][j] != '2' ):
+            matrizAux[i].append('1')
+        else:
+           matrizAux[i].append('0')
+i = 0
+j = 0
+k = 0
+l = 0
+#montagem da primeira parte do grafo
+for i in range(len(matrizSat)):
+    for j in range(variaveisSat):
+        if(matrizAux[i][j] == '1'):
+            for k in range(variaveisSat):
+                if(k != j and matrizAux[i][k] == '1'):
+                   matrizGrafoSat[(i*variaveisSat)+k].append('1')
+                else:
+                   matrizGrafoSat[(i*variaveisSat) + k].append('0')
+        else:
+           for l in range(variaveisSat):
+                matrizGrafoSat[(i*variaveisSat)+l].append('0')
+
+for i in range(len(matrizGrafoSat)):
+    for j in range((len(matrizSat)*variaveisSat)-variaveisSat):
+        matrizGrafoSat[i].append(('0'))
+
+#acrescentando arestas necessarias
+i = 0
+j = 0
+k = 0
+l = 0
+for i in range(len(matrizSat)):
+    for j in range(variaveisSat):
+        for k in range(len(matrizSat)):
+            if(matrizSat[i][j] != matrizSat[k][j] and matrizSat[i][j] != '2' and matrizSat[k][j] != '2'):
+                matrizGrafoSat[i][k*6] = '1'
+                print('oi')
 #def eCompleta():
 melhor = []
 consistente=False
@@ -110,7 +173,7 @@ j = 0
 #solucoes = []
 j=0
 BranchBound(listaVertices, solucao, n, j)
-print("Conjunto independente máximo: ")
+print("Conjunto independente maximo: ")
 
 for i in melhor:
 
@@ -143,7 +206,7 @@ for i in range(n):
 
 j=0
 BranchBound(listaVertices, solucao, n, j)
-print("Clique máximo: ")
+print("Clique maximo: ")
 
 for i in melhor:
 
