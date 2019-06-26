@@ -1,4 +1,4 @@
-arq = open('grafo_modelo.txt', 'r')
+arq = open('grafo.txt', 'r')
 texto = []
 matriz = []
 texto = arq.readlines()
@@ -54,7 +54,6 @@ j=0
 
 for i in range(len(matrizSat)):
     for j in range(variaveisSat):
-        print(matrizSat[i][j])
         if(matrizSat[i][j] != '2' ):
             matrizAux[i].append('1')
         else:
@@ -79,14 +78,13 @@ verticeSat = {
     'barrado':False,
 }
 
-# ATRIBUICAO DAS ADJACENCIAS A PARTIR DO 6
 for i in range(len(matrizAux)):
     for j in range(variaveisSat):
         if(matrizAux[i][j] == '1'):
             verticeSat['valor'] = i*variaveisSat+j
             for k in range(variaveisSat):
                 if(matrizAux[i][k] == '1' and k!=j):
-                    verticeSat['adjacentes'].append(int(k))
+                    verticeSat['adjacentes'].append(int(i*variaveisSat+k))
                     if(matrizSat[i][j] == '0'):
                         verticeSat['barrado'] = True
             listaSAT[i*variaveisSat+j] = verticeSat
@@ -100,9 +98,9 @@ for i in range(len(matrizAux)):
 
 i=0
 j=0
-for i in range(len(matrizAux)):
+for i in range(len(matrizAux)*variaveisSat):
     for j in range(len(matrizAux)*variaveisSat):
-        if(j%variaveisSat==i):
+        if(j>i and listaSAT[i]["valor"]!=None and j%variaveisSat==(listaSAT[i]["valor"]%variaveisSat)):
 
             if (listaSAT[j]["valor"] != None and len(listaSAT[j])!=0 and i!=j and listaSAT[i]["barrado"] != listaSAT[j]["barrado"]):
                 listaSAT[i]["adjacentes"].append(listaSAT[j]["valor"])
@@ -185,8 +183,12 @@ solucao = []
 j=0
 
 for i in melhor:
+    valor = i["valor"]
+    if (i['barrado'] == True):
+        print("_")
+    print( valor % variaveisSat)
 
-    print(i["valor"] , " ")
+
 #for i in listaVertices:
 del melhor[:]
 
@@ -239,5 +241,3 @@ print("Clique maximo: ")
 for i in melhor:
 
     print(i["valor"] , " ")
-
-
