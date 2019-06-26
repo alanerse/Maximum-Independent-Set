@@ -277,7 +277,12 @@ def conjuntoIndependenteMaximo(nome):
     for i in melhor:
         print(i["valor"], " ")
 
-
+segundos = time.time()
 conjuntoIndependenteMaximo("grafo_modelo.txt")
+print("Tempo gasto:" + str(time.time()-segundos) )
+segundos = time.time()
 sat("grafo_Sat_modelo1.txt")
+print("Tempo gasto:" + str(time.time()-segundos))
+segundos = time.time()
 clique("grafo_modelo.txt")
+print("Tempo gasto:" + str(time.time()-segundos))
