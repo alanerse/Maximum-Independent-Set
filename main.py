@@ -1,4 +1,4 @@
-arq = open('grafo.txt', 'r')
+arq = open('grafo_modelo3.txt', 'r')
 texto = []
 matriz = []
 texto = arq.readlines()
@@ -29,7 +29,7 @@ for i in range(n):
 
     }
 
-arqSat = open('grafo_Sat_modelo1.txt', 'r')
+arqSat = open('grafo_Sat_modelo2.txt', 'r')
 textoSat = []
 matrizSat = []
 matrizGrafoSat= []
@@ -182,15 +182,53 @@ print("Satisfabilidade: ")
 solucao = []
 j=0
 
-for i in melhor:
-    valor = i["valor"]
-    if (i['barrado'] == True):
-        print("_")
-    print( valor % variaveisSat)
+valorVariavelSat=[]
+for j in range(variaveisSat):
+    listaux = []
+    valorVariavelSat.append(listaux)
+j=0
+for j in range(len(melhor)):
+    valorVariavelSat[melhor[j]['valor']%variaveisSat].append(melhor[j]['barrado'])
 
+i=0
+j=0
+contar = 0
+for i in range(len(matrizSat)):
+    for j in range(variaveisSat):
+        if(len(valorVariavelSat[j]) != 0):
+            if(valorVariavelSat[j][0]== True):
+                if(matrizSat[i][j] == '0'):
+                    matrizSat[i][j] = '1'
+                else:
+                    matrizSat[i][j] = '0'
+        if(matrizSat[i][j]=='2'):
+            matrizSat[i][j] = '0'
+        if(matrizSat[i][j] == '1'):
+            contar = contar + 1
 
-#for i in listaVertices:
-del melhor[:]
+    if(contar==0):
+        print('Nao tem respostar factivel para esta expressao')
+        #return false
+    contar=0
+#return true
+i=0
+j=0
+
+for i in range(len(valorVariavelSat)):
+
+    if(len(valorVariavelSat[i]) > 0):
+
+        if(valorVariavelSat[i][0] == True):
+            print("Variavel "+ str(i) + " tem que ser falsa ")
+        else:
+            print("Variavel "+ str(i) + " tem que ser verdadeira")
+
+    else:
+        print("Variavel "+ str(i) + " pode ser verdadeira ou falsa")
+#
+#
+# #for i in listaVertices:
+# del melhor[:]
 
 # for i in range(n):
 #     for j in range(n):
@@ -201,13 +239,14 @@ del melhor[:]
 j = 0
 
 #solucoes = []
-j=0
-BranchBound(listaVertices, solucao, n, j)
-print("Conjunto independente maximo: ")
-
-for i in melhor:
-
-    print(i["valor"] , " ")
+# solucao = []
+# j=0
+# BranchBound(listaVertices, solucao, n, j)
+# print("Conjunto independente maximo: ")
+#
+# for i in melhor:
+#
+#     print(i["valor"] , " ")
 
 del listaVertices[:]
 del melhor[:]
@@ -235,6 +274,7 @@ for i in range(n):
     }
 
 j=0
+solucao =[]
 BranchBound(listaVertices, solucao, n, j)
 print("Clique maximo: ")
 
