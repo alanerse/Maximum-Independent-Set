@@ -1,116 +1,19 @@
-arq = open('grafo_modelo3.txt', 'r')
-texto = []
-matriz = []
-texto = arq.readlines()
-for i in range(len(texto)):
-    if(i != 0):
-       matriz.append(texto[i].split())
-
-arq.close()
-n = i
-
-listaVertices = []
-vertice = {
-    'valor': None,
-    'adjacentes':[],
-    'presente':False
-}
-
-for i in range(n):
-    vertice['valor'] = i
-    for j in range(n):
-        if(matriz[i][j] == '1'):
-            vertice['adjacentes'].append(j)
-    listaVertices.append(vertice)
-    vertice = {
-        'valor': None,
-        'adjacentes': [],
-        'presente':False
-
-    }
-
-arqSat = open('grafo_Sat_modelo2.txt', 'r')
-textoSat = []
-matrizSat = []
-matrizGrafoSat= []
-matrizAux = []
-textoSat = arqSat.readlines()
-for i in range(len(textoSat)):
-    if(i != 0):
-       matrizSat.append(textoSat[i].split())
-
-arqSat.close()
-variaveisSat = textoSat[0].split()
-variaveisSat = int(variaveisSat[0])
-for y in range(len(matrizSat)*variaveisSat):
-    linhaAux = []
-    matrizGrafoSat.append(linhaAux[:])
-for z in range(len(matrizSat)):
-    linhaAux = []
-    matrizAux.append(linhaAux[:])
-
-i=0
-j=0
-
-for i in range(len(matrizSat)):
-    for j in range(variaveisSat):
-        if(matrizSat[i][j] != '2' ):
-            matrizAux[i].append('1')
-        else:
-           matrizAux[i].append('0')
-i = 0
-j = 0
-
-listaSAT = []
-for y in range(len(matrizSat)*variaveisSat):
-    verticeSatAux = {
-        'valor': None,
-        'adjacentes': [],
-        'presente': False,
-        'barrado': False,
-    }
-    listaSAT.append(verticeSatAux)
-
-verticeSat = {
-    'valor': None,
-    'adjacentes':[],
-    'presente':False,
-    'barrado':False,
-}
-
-for i in range(len(matrizAux)):
-    for j in range(variaveisSat):
-        if(matrizAux[i][j] == '1'):
-            verticeSat['valor'] = i*variaveisSat+j
-            for k in range(variaveisSat):
-                if(matrizAux[i][k] == '1' and k!=j):
-                    verticeSat['adjacentes'].append(int(i*variaveisSat+k))
-                    if(matrizSat[i][j] == '0'):
-                        verticeSat['barrado'] = True
-            listaSAT[i*variaveisSat+j] = verticeSat
-            verticeSat = {
-                'valor': None,
-                'adjacentes': [],
-                'presente': False,
-                'barrado': False,
-            }
-
-
-i=0
-j=0
-for i in range(len(matrizAux)*variaveisSat):
-    for j in range(len(matrizAux)*variaveisSat):
-        if(j>i and listaSAT[i]["valor"]!=None and j%variaveisSat==(listaSAT[i]["valor"]%variaveisSat)):
-
-            if (listaSAT[j]["valor"] != None and len(listaSAT[j])!=0 and i!=j and listaSAT[i]["barrado"] != listaSAT[j]["barrado"]):
-                listaSAT[i]["adjacentes"].append(listaSAT[j]["valor"])
-                listaSAT[j]["adjacentes"].append(listaSAT[i]["valor"])
-i=0
-
-#def eCompleta():
+import time
+#variaveis globais
 melhor = []
 consistente=False
 contar = 0
+def leArquivo(nome, matriz):
+
+    arq = open(nome, 'r')
+    texto = []
+    texto = arq.readlines()
+    for i in range(len(texto)):
+        if(i != 0):
+           matriz.append(texto[i].split())
+
+    arq.close()
+
 def BranchBound(listaVertices, solucao, tam, j):
     global melhor
     global consistente
@@ -175,109 +78,206 @@ def eConsistente(solucao,inserido,listaVertices):
     # listaVertices[inserido[]]
     return True
 
-solucao = []
-j=0
-BranchBound(listaSAT, solucao, len(listaSAT), j)
-print("Satisfabilidade: ")
-solucao = []
-j=0
-
-valorVariavelSat=[]
-for j in range(variaveisSat):
-    listaux = []
-    valorVariavelSat.append(listaux)
-j=0
-for j in range(len(melhor)):
-    valorVariavelSat[melhor[j]['valor']%variaveisSat].append(melhor[j]['barrado'])
-
-i=0
-j=0
-contar = 0
-for i in range(len(matrizSat)):
-    for j in range(variaveisSat):
-        if(len(valorVariavelSat[j]) != 0):
-            if(valorVariavelSat[j][0]== True):
-                if(matrizSat[i][j] == '0'):
-                    matrizSat[i][j] = '1'
-                else:
-                    matrizSat[i][j] = '0'
-        if(matrizSat[i][j]=='2'):
-            matrizSat[i][j] = '0'
-        if(matrizSat[i][j] == '1'):
-            contar = contar + 1
-
-    if(contar==0):
-        print('Nao tem respostar factivel para esta expressao')
-        #return false
-    contar=0
-#return true
-i=0
-j=0
-
-for i in range(len(valorVariavelSat)):
-
-    if(len(valorVariavelSat[i]) > 0):
-
-        if(valorVariavelSat[i][0] == True):
-            print("Variavel "+ str(i) + " tem que ser falsa ")
-        else:
-            print("Variavel "+ str(i) + " tem que ser verdadeira")
-
-    else:
-        print("Variavel "+ str(i) + " pode ser verdadeira ou falsa")
-#
-#
-# #for i in listaVertices:
-# del melhor[:]
-
-# for i in range(n):
-#     for j in range(n):
-#         if(len(listaVertices[i]['adjacentes']) < len(listaVertices[j]['adjacentes']) ):
-#             aux = listaVertices[j]
-#             listaVertices[j] = listaVertices[i]
-#             listaVertices[i] = aux
-j = 0
-
-#solucoes = []
-# solucao = []
-# j=0
-# BranchBound(listaVertices, solucao, n, j)
-# print("Conjunto independente maximo: ")
-#
-# for i in melhor:
-#
-#     print(i["valor"] , " ")
-
-del listaVertices[:]
-del melhor[:]
-for i in range(n):
-    for j in range(n):
-        if(i==j) :
-            matriz[i][j]='0'
-        else:
-            if(matriz[i][j]=='1'):
-                matriz[i][j]='0'
-            else:
-                matriz[i][j]='1'
-
-for i in range(n):
-    vertice['valor'] = i
-    for j in range(n):
-        if(matriz[i][j] == '1'):
-            vertice['adjacentes'].append(j)
-    listaVertices.append(vertice)
+def criaListaAdjacencias(listaVertices, matriz,n):
     vertice = {
         'valor': None,
         'adjacentes': [],
-        'presente':False
+        'presente': False
+    }
+    for i in range(n):
+        vertice['valor'] = i
+        for j in range(n):
+            if(matriz[i][j] == '1'):
+                vertice['adjacentes'].append(j)
+        listaVertices.append(vertice)
+        vertice = {
+            'valor': None,
+            'adjacentes': [],
+            'presente':False
+
+        }
+
+def clique(nome):
+    global melhor
+    matriz = []
+    leArquivo(nome, matriz)
+    n = len(matriz)
+
+    listaVertices = []
+    # criaListaAdjacencias(listaVertices, matriz,n)
+
+    vertice = {
+        'valor': None,
+        'adjacentes': [],
+        'presente': False
 
     }
 
-j=0
-solucao =[]
-BranchBound(listaVertices, solucao, n, j)
-print("Clique maximo: ")
+    for i in range(n):
+        for j in range(n):
+            if (i == j):
+                matriz[i][j] = '0'
+            else:
+                if (matriz[i][j] == '1'):
+                    matriz[i][j] = '0'
+                else:
+                    matriz[i][j] = '1'
 
-for i in melhor:
+    for i in range(n):
+        vertice['valor'] = i
+        for j in range(n):
+            if (matriz[i][j] == '1'):
+                vertice['adjacentes'].append(j)
+        listaVertices.append(vertice)
+        vertice = {
+            'valor': None,
+            'adjacentes': [],
+            'presente': False
 
-    print(i["valor"] , " ")
+        }
+
+    j = 0
+    solucao = []
+    melhor = []
+    BranchBound(listaVertices, solucao, n, j)
+    print("Clique maximo: ")
+
+    for i in melhor:
+        print(i["valor"], " ")
+
+def sat(nome):
+    global melhor
+    matrizSat = []
+    leArquivo(nome,matrizSat)
+    matrizGrafoSat= []
+    matrizAux = []
+    variaveisSat = len(matrizSat[0])
+    #Cria a matrizGrafosat
+    for y in range(len(matrizSat)*variaveisSat):
+        linhaAux = []
+        matrizGrafoSat.append(linhaAux[:])
+    #Cria a matrizAux
+    for z in range(len(matrizSat)):
+        linhaAux = []
+        matrizAux.append(linhaAux[:])
+
+    for i in range(len(matrizSat)):
+        for j in range(variaveisSat):
+            if(matrizSat[i][j] != '2' ):
+                matrizAux[i].append('1')
+            else:
+               matrizAux[i].append('0')
+
+    listaSAT = []
+    for y in range(len(matrizSat)*variaveisSat):
+        verticeSatAux = {
+            'valor': None,
+            'adjacentes': [],
+            'presente': False,
+            'barrado': False,
+        }
+        listaSAT.append(verticeSatAux)
+
+    verticeSat = {
+        'valor': None,
+        'adjacentes':[],
+        'presente':False,
+        'barrado':False,
+    }
+
+    for i in range(len(matrizAux)):
+        for j in range(variaveisSat):
+            if(matrizAux[i][j] == '1'):
+                verticeSat['valor'] = i*variaveisSat+j
+                for k in range(variaveisSat):
+                    if(matrizAux[i][k] == '1' and k!=j):
+                        verticeSat['adjacentes'].append(int(i*variaveisSat+k))
+                        if(matrizSat[i][j] == '0'):
+                            verticeSat['barrado'] = True
+                listaSAT[i*variaveisSat+j] = verticeSat
+                verticeSat = {
+                    'valor': None,
+                    'adjacentes': [],
+                    'presente': False,
+                    'barrado': False,
+                }
+
+    for i in range(len(matrizAux)*variaveisSat):
+        for j in range(len(matrizAux)*variaveisSat):
+            if(j>i and listaSAT[i]["valor"]!=None and j%variaveisSat==(listaSAT[i]["valor"]%variaveisSat)):
+
+                if (listaSAT[j]["valor"] != None and len(listaSAT[j])!=0 and i!=j and listaSAT[i]["barrado"] != listaSAT[j]["barrado"]):
+                    listaSAT[i]["adjacentes"].append(listaSAT[j]["valor"])
+                    listaSAT[j]["adjacentes"].append(listaSAT[i]["valor"])
+
+    solucao = []
+    melhor = []
+    BranchBound(listaSAT, solucao, len(listaSAT), 0)
+    print("Satisfabilidade: ")
+    solucao = []
+
+    valorVariavelSat=[]
+    for j in range(variaveisSat):
+        listaux = []
+        valorVariavelSat.append(listaux)
+
+    for j in range(len(melhor)):
+        valorVariavelSat[melhor[j]['valor']%variaveisSat].append(melhor[j]['barrado'])
+
+
+    contar = 0
+    temSolucao = True
+    for i in range(len(matrizSat)):
+        for j in range(variaveisSat):
+            if(len(valorVariavelSat[j]) != 0):
+                if(valorVariavelSat[j][0]== True):
+                    if(matrizSat[i][j] == '0'):
+                        matrizSat[i][j] = '1'
+                    else:
+                        matrizSat[i][j] = '0'
+            if(matrizSat[i][j]=='2'):
+                matrizSat[i][j] = '0'
+            if(matrizSat[i][j] == '1'):
+                contar = contar + 1
+
+        if(contar==0):
+            print('Nao tem respostar factivel para esta expressao')
+            temSolucao = False
+            break
+            #return false
+        contar=0
+
+    if(temSolucao):
+        for i in range(len(valorVariavelSat)):
+
+            if(len(valorVariavelSat[i]) > 0):
+
+                if(valorVariavelSat[i][0] == True):
+                    print("Variavel "+ str(i) + " tem que ser falsa ")
+                else:
+                    print("Variavel "+ str(i) + " tem que ser verdadeira")
+
+            else:
+                print("Variavel "+ str(i) + " pode ser verdadeira ou falsa")
+
+def conjuntoIndependenteMaximo(nome):
+    global melhor
+    matriz = []
+    solucao = []
+    leArquivo(nome, matriz)
+    n = len(matriz)
+
+    listaVertices = []
+    criaListaAdjacencias(listaVertices, matriz, n)
+
+    melhor = []
+    BranchBound(listaVertices, solucao, n, 0)
+    print("Conjunto independente maximo: ")
+
+    for i in melhor:
+        print(i["valor"], " ")
+
+
+conjuntoIndependenteMaximo("grafo_modelo.txt")
+sat("grafo_Sat_modelo1.txt")
+clique("grafo_modelo.txt")
