@@ -3,6 +3,7 @@ import time
 melhor = []
 consistente=False
 contar = 0
+
 def leArquivo(nome, matriz):
 
     arq = open(nome, 'r')
@@ -13,6 +14,14 @@ def leArquivo(nome, matriz):
            matriz.append(texto[i].split())
 
     arq.close()
+
+def solucaoInicial(listaVertices):
+    inicial = []
+    for i in range(len(listaVertices)):
+        inicial.append(listaVertices[i])
+        if (eConsistente(inicial,listaVertices[i],listaVertices)!=True):
+            inicial.pop()
+    return inicial
 
 def BranchBound(listaVertices, solucao, tam, j):
     global melhor
@@ -138,7 +147,7 @@ def clique(nome):
 
     j = 0
     solucao = []
-    melhor = []
+    melhor = solucaoInicial(listaVertices)
     BranchBound(listaVertices, solucao, n, j)
     print("Clique maximo: ")
 
@@ -211,7 +220,8 @@ def sat(nome):
                     listaSAT[j]["adjacentes"].append(listaSAT[i]["valor"])
 
     solucao = []
-    melhor = []
+
+    melhor = solucaoInicial(listaSAT)
     BranchBound(listaSAT, solucao, len(listaSAT), 0)
     print("Satisfabilidade: ")
     solucao = []
@@ -270,7 +280,8 @@ def conjuntoIndependenteMaximo(nome):
     listaVertices = []
     criaListaAdjacencias(listaVertices, matriz, n)
 
-    melhor = []
+    melhor = solucaoInicial(listaVertices)
+    print(melhor)
     BranchBound(listaVertices, solucao, n, 0)
     print("Conjunto independente maximo: ")
 
@@ -279,10 +290,10 @@ def conjuntoIndependenteMaximo(nome):
 
 segundos = time.time()
 conjuntoIndependenteMaximo("grafo_modelo.txt")
-print("Tempo gasto:" + str(time.time()-segundos) )
-segundos = time.time()
-sat("grafo_Sat_modelo1.txt")
 print("Tempo gasto:" + str(time.time()-segundos))
 segundos = time.time()
 clique("grafo_modelo.txt")
+print("Tempo gasto:" + str(time.time()-segundos))
+segundos = time.time()
+sat("grafo_Sat_modelo1.txt")
 print("Tempo gasto:" + str(time.time()-segundos))
