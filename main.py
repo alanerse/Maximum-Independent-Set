@@ -17,6 +17,7 @@ def leArquivo(nome, matriz):
 
 def solucaoInicial(listaVertices):
     inicial = []
+    #percorremos a lista e inserimos na solucao quando eConsistente retornar verdadeiro
     for i in range(len(listaVertices)):
         inicial.append(listaVertices[i])
         if (eConsistente(inicial,listaVertices[i],listaVertices)!=True):
@@ -27,6 +28,7 @@ def BranchBound(listaVertices, solucao, tam, j):
     global melhor
     global consistente
     global contar
+
     if(eCompleta(j,tam)):
         contar = contar + 1
 
@@ -46,18 +48,19 @@ def BranchBound(listaVertices, solucao, tam, j):
 
             if(aux["valor"]!= None):
                 listaVertices[aux["valor"]]["presente"]=False
-                # for k in aux["adjacentes"]:
-                #     listaVertices[k]["presente"]=False
+
             j = j+1
 
             if (eCompleta(j, tam)):
                 contar = contar + 1
-
+                #se a quantidade de vertices da solucao atual for melhor q a quantidade de vertices da melhor solucao
+                #atualiza se a melhor solucao
                 if (len(solucao) >= len(melhor)):
                     melhor = solucao[:]
 
 def eCompleta(j,tam):
-
+    #se o j for igual ao tamanho quer dizer q ja percorri toda a lista verificando se eConsistente e se ePromissor
+    #sendo assim nao tem mais ninguem para inserir e a solucao e Completa
     if(j==tam):
         return True
     return False
@@ -65,8 +68,8 @@ def eCompleta(j,tam):
 def ePromissor(listaVertices,solucao,melhor):
 
     cont = 0
+    #verificamos se na solucao atual e possivel inserir mais vertices do que a melhor solucao
     for a in listaVertices:
-
         if(a["presente"]==False):
             cont = cont + 1
     if(len(melhor)< len(solucao)+cont-1):
@@ -75,16 +78,16 @@ def ePromissor(listaVertices,solucao,melhor):
         return False
 
 def eConsistente(solucao,inserido,listaVertices):
+    #se o vertice a ser inserido ja esta na solucao, entao nao e consistente
     if (inserido['presente'] == 'True' or inserido['valor'] == None):
         return False
+    #verificacao se o vertice a ser inserido tem adjacencia com alguem q ja esta na solucao
     for i in solucao:
         for j in i['adjacentes']:
             if (j == inserido['valor']):
                 return False
     listaVertices[inserido['valor']]['presente'] = True
-    # for j in inserido['adjacentes']:
-    #     listaVertices[j]['presente'] = True
-    # listaVertices[inserido[]]
+
     return True
 
 def criaListaAdjacencias(listaVertices, matriz,n):
@@ -93,6 +96,7 @@ def criaListaAdjacencias(listaVertices, matriz,n):
         'adjacentes': [],
         'presente': False
     }
+    #cria a lista de adjacencias
     for i in range(n):
         vertice['valor'] = i
         for j in range(n):
@@ -121,7 +125,7 @@ def clique(nome):
         'presente': False
 
     }
-
+    #criando o grafo complemento, sem arestas do vertice para ele mesmo
     for i in range(n):
         for j in range(n):
             if (i == j):
@@ -131,7 +135,7 @@ def clique(nome):
                     matriz[i][j] = '0'
                 else:
                     matriz[i][j] = '1'
-
+    #criacao da lista de adjacencias
     for i in range(n):
         vertice['valor'] = i
         for j in range(n):
@@ -150,26 +154,23 @@ def clique(nome):
     melhor = solucaoInicial(listaVertices)
     BranchBound(listaVertices, solucao, n, j)
     print("Clique maximo: ")
-
+    #impressao do clique maximo
     for i in melhor:
         print(i["valor"], " ")
 
 def sat(nome):
     global melhor
-    matrizSat = []
+    matrizSat = [] #matriz no formato da entrada do arquivo
     leArquivo(nome,matrizSat)
-    matrizGrafoSat= []
-    matrizAux = []
+    matrizAux = [] #matriz para saber quais sao os grafos completos
     variaveisSat = len(matrizSat[0])
-    #Cria a matrizGrafosat
-    for y in range(len(matrizSat)*variaveisSat):
-        linhaAux = []
-        matrizGrafoSat.append(linhaAux[:])
+
     #Cria a matrizAux
     for z in range(len(matrizSat)):
         linhaAux = []
         matrizAux.append(linhaAux[:])
 
+    #Leitura do arquivo
     for i in range(len(matrizSat)):
         for j in range(variaveisSat):
             if(matrizSat[i][j] != '2' ):
@@ -178,6 +179,8 @@ def sat(nome):
                matrizAux[i].append('0')
 
     listaSAT = []
+
+    #Alocação do meu dicionario na listaSat
     for y in range(len(matrizSat)*variaveisSat):
         verticeSatAux = {
             'valor': None,
@@ -194,9 +197,11 @@ def sat(nome):
         'barrado':False,
     }
 
+    #Criação dos grafos completos para cada clausula
     for i in range(len(matrizAux)):
         for j in range(variaveisSat):
             if(matrizAux[i][j] == '1'):
+                # usamos esse calculo para poder definir os valores dos vertices, sendo util para poder repetir vertices
                 verticeSat['valor'] = i*variaveisSat+j
                 for k in range(variaveisSat):
                     if(matrizAux[i][k] == '1' and k!=j):
@@ -211,6 +216,7 @@ def sat(nome):
                     'barrado': False,
                 }
 
+    #adicionar as arestas que estavam faltando no grafo
     for i in range(len(matrizAux)*variaveisSat):
         for j in range(len(matrizAux)*variaveisSat):
             if(j>i and listaSAT[i]["valor"]!=None and j%variaveisSat==(listaSAT[i]["valor"]%variaveisSat)):
@@ -222,21 +228,24 @@ def sat(nome):
     solucao = []
 
     melhor = solucaoInicial(listaSAT)
+    #Chamamos o BranchBound para retornar o conjunto independente maximo.
     BranchBound(listaSAT, solucao, len(listaSAT), 0)
     print("Satisfabilidade: ")
     solucao = []
 
     valorVariavelSat=[]
+    #alocacao do vetor de lista
     for j in range(variaveisSat):
         listaux = []
         valorVariavelSat.append(listaux)
-
+    #Adicionando o valor da variavel (barrado ou nao barrado)
     for j in range(len(melhor)):
         valorVariavelSat[melhor[j]['valor']%variaveisSat].append(melhor[j]['barrado'])
 
 
     contar = 0
     temSolucao = True
+    #verificacao se tem ou se nao tem resposta factivel (verificador para sat)
     for i in range(len(matrizSat)):
         for j in range(variaveisSat):
             if(len(valorVariavelSat[j]) != 0):
@@ -258,6 +267,7 @@ def sat(nome):
         contar=0
 
     if(temSolucao):
+        #impressao da solucao
         for i in range(len(valorVariavelSat)):
 
             if(len(valorVariavelSat[i]) > 0):
@@ -285,15 +295,16 @@ def conjuntoIndependenteMaximo(nome):
     BranchBound(listaVertices, solucao, n, 0)
     print("Conjunto independente maximo: ")
 
+    #impressao do conjunto independente maximo
     for i in melhor:
         print(i["valor"], " ")
 
 segundos = time.time()
-conjuntoIndependenteMaximo("grafo_modelo.txt")
+conjuntoIndependenteMaximo("grafo.txt")
 print("Tempo gasto:" + str(time.time()-segundos))
 segundos = time.time()
-clique("grafo_modelo.txt")
+clique("grafo.txt")
 print("Tempo gasto:" + str(time.time()-segundos))
 segundos = time.time()
-sat("grafo_Sat_modelo1.txt")
+sat("entradaSat.txt")
 print("Tempo gasto:" + str(time.time()-segundos))
