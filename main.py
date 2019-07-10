@@ -196,7 +196,7 @@ def sat(nome):
         'presente':False,
         'barrado':False,
     }
-
+    # so estou testando
     #Criação dos grafos completos para cada clausula
     for i in range(len(matrizAux)):
         for j in range(variaveisSat):
